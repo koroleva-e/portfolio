@@ -4,7 +4,7 @@
 |№|Название проекта|Описание|Инструменты|Навыки|
 |---|---|---|---|---|
 |1|[Исследование авторынка Казахстана для дилера Mercur Auto](https://github.com/koroleva-e/portfolio/tree/main/Авторынок%20Казахстана)|Чищу очень грязные исходные данные, которые собрали вручную. Анализирую рынок, вывожу показатели эффективности компании и даю рекомендации|`Python` `Pandas` `Numpy` `Matplotlib` `Plotly`|`тренировка предобработки данных`|
-|2|[Дашборд в Looker на базе данных из сервиса МойСклад для розничной сети Domino Home & Horeca](https://github.com/koroleva-e/portfolio/tree/main/Дашборд%20для%20Domino%20Home%20%26%20Horeca)|Создала дашборд в Looker для розничной сети Domino Home & Horeca на базе данных из сервиса МойСклад|`Looker` `BigQuery` `SQL`|`работа с BI`|
+|2|[Дашборд в Looker на базе данных из сервиса МойСклад для розничной сети Domino Home & Horeca](https://github.com/koroleva-e/portfolio/tree/main/Дашборд%20для%20Domino%20Home%20%26%20Horeca)|Создала дашборд в Looker для розничной сети Domino Home & Horeca на базе данных из сервиса МойСклад|`Looker` `BigQuery` `SQL`|`BI` `базы данных`|
 
 # Учебные проекты
 
