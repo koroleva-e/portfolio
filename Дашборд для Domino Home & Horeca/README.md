@@ -22,4 +22,5 @@ CloudReports
 
 # Готовые материалы:
 - [💾 Дашборд (pdf)](https://github.com/koroleva-e/portfolio/blob/main/Дашборд%20для%20Domino%20Home%20%26%20Horeca/bi_dash.pdf)
-- [📊 Looker](https://lookerstudio.google.com/reporting/67735b39-4327-495e-ab83-7b625c8f6156)
+- [📊 Дашборд (Looker)](https://lookerstudio.google.com/reporting/67735b39-4327-495e-ab83-7b625c8f6156)
+- [🔎 SQL-запросы](https://github.com/koroleva-e/portfolio/blob/main/Дашборд%20для%20Domino%20Home%20%26%20Horeca/SQL-запросы)
