@@ -1,0 +1,67 @@
+# Выручка по магазинам / выручка по месяцам
+
+SELECT
+
+DATE(a.created) AS date,                                                                    -- Дата создания
+IFNULL(CAST (a.sum AS numeric), 0)/100 AS sum_sales,                                        -- Сумма Розничной продажи (руб)
+IFNULL(CAST (a.cashSum AS numeric), 0)/100 AS cashSum_sales,                                -- Оплачено наличными (руб)
+IFNULL(CAST (a.noCashSum AS numeric), 0)/100 AS noCash_sales,                               -- Оплачено картой (руб)
+b.name AS retail_store,                                                                     -- Наименование Точки продаж
+IFNULL(c.sum_return/100, 0) AS sum_return,                                                  -- Сумма Возврата Покупателя (руб)
+IFNULL(c.cashSum_return/100, 0) AS cashSum_return,                                          -- Оплачено наличными (руб)
+IFNULL(c.noCash_return/100, 0) AS noCashSum_return,                                         -- Оплачено картой (руб)
+IFNULL(CAST(a.sum AS numeric), 0)/100 - IFNULL(c.sum_return/100, 0) AS sales_without_return -- Сумма Розничной продажи минус возвраты (руб)
+ 
+FROM `br02-327619.training_ms.brv_retaildemand` AS a -- Розничные продажи
+
+LEFT JOIN `br02-327619.training_ms.brv_retailstore` b ON a.retailStore = b.href -- Точка продаж
+LEFT JOIN (SELECT demand,                                                                   -- Ссылка на отгрузку, по которой произошел возврат
+                  SUM(CAST (a.sum AS numeric)) AS sum_return,                               -- Сумма Возврата Покупателя (коп)
+                  SUM(CAST (cashSum as numeric)) as cashSum_return,                         -- Оплачено наличными (коп)
+                  SUM(CAST (NoCashSum as numeric)) AS noCash_return                         -- Оплачено картой (коп)
+           FROM `br02-327619.training_ms.brv_retailsalesreturn` AS a 
+           GROUP BY 1) AS c ON a.href = c.demand -- Возврат предоплаты
+
+# Группы товаров
+
+WITH
+goods AS  
+(SELECT href, productfolder FROM br02-327619.training_ms.brv_product
+UNION ALL
+SELECT href, productfolder FROM br02-327619.training_ms.brv_bundle -- Комплекты
+UNION ALL
+SELECT href, productfolder FROM br02-327619.training_ms.brv_service)
+
+
+SELECT SUM((CAST(a.quantity AS numeric) * CAST(a.price AS numeric) - CAST(a.quantity AS numeric) * CAST(a.price AS numeric) * CAST(a.discount as numeric)/100)/100) AS sales, -- количество * цена - количество * цена * скидка
+       c.name
+FROM br02-327619.training_ms.brv_retaildemand_positions a LEFT JOIN goods ON a.assortment = goods.href
+LEFT JOIN br02-327619.training_ms.brv_productfolder c ON goods.productFolder = c.href
+GROUP BY 2
+
+# Приход/Расход
+
+WITH
+cash AS 
+(SELECT
+IFNULL(date_cash_in, date_cash_out) AS date,
+IFNULL(retailShift_cash_in, retailShift_cash_out) AS retailShift,
+IFNULL(SUM(cash_in)/100, 0) AS cash_in,
+IFNULL(SUM(cash_out)/100, 0) AS cash_out,
+IFNULL(SUM(cash_in)/100, 0) - IFNULL(SUM(cash_out)/100, 0) AS balance
+
+
+
+
+FROM
+(SELECT DATE(a.created) AS date_cash_in, retailShift AS retailShift_cash_in, SUM(CAST(sum AS numeric)) AS cash_in FROM `br02-327619.training_ms.brv_retaildrawercashin` a GROUP BY 1, 2) a
+FULL OUTER JOIN
+(SELECT DATE(b.created) AS date_cash_out, retailShift AS retailShift_cash_out, SUM(CAST(sum AS numeric)) AS cash_out  FROM `br02-327619.training_ms.brv_retaildrawercashout` b GROUP BY 1, 2) b
+ON a.date_cash_in = b.date_cash_out and a.retailShift_cash_in = b.retailShift_cash_out
+GROUP BY 1, 2),
+
+
+stores AS (SELECT distinct href, retailStore from `br02-327619.training_ms.brv_retailshift`)
+
+
+SELECT cash.* EXCEPT(retailShift), c.Name AS retailStore FROM cash LEFT JOIN stores ON cash.retailShift = stores.href LEFT JOIN `br02-327619.training_ms.brv_retailstore` c ON stores.retailStore = c.href
